@@ -160,6 +160,30 @@ SOLUTION_FLAG tridiagonalAlgoritm(const std::vector<std::vector<Type>> &lCoefs, 
 }
 
 template<typename Type>
+SOLUTION_FLAG tridiagonalAlgoritm(const std::vector<Type> &diag, std::vector<Type> &lDiag, std::vector<Type> &uDiag, const std::vector<Type> &rVec, std::vector<Type> &solution){
+    std::size_t dim = diag.size();
+    if (lDiag.size() != dim - 1 || uDiag.size() != dim - 1 || rVec.size() != dim){
+        return NO_SOLUTION;
+    }
+    lDiag.insert(lDiag.begin(), 1, 0.0);
+    uDiag.push_back(0.0);
+    solution.resize(dim);
+    std::vector<Type> alpha = {-uDiag[0] / diag[0]};
+    std::vector<Type> beta = {rVec[0] / diag[0]};
+    for (std::size_t i = 1; i < dim - 1; i++){
+        Type c = diag[i] + lDiag[i] * alpha[i - 1];
+        alpha.push_back(-uDiag[i] / c);
+        beta.push_back((rVec[i] - lDiag[i] * beta[i - 1]) / c);
+    }
+    beta.push_back((rVec[dim - 1] - lDiag[dim - 1] * beta[dim - 2]) / (diag[dim - 1] + lDiag[dim - 1] * alpha[dim - 2]));
+    solution[dim - 1] = beta[dim - 1];
+    for (int i = dim - 2; i >= 0; i--){
+        solution[i] = alpha[i] * solution[i + 1] + beta[i];
+    }
+    return HAS_SOLUTION;
+}
+
+template<typename Type>
 SOLUTION_FLAG qrMethod(std::vector<std::vector<Type>> &lCoefs, std::vector<Type> &rCoefs, std::vector<Type> &solution, Type accuracy){
     std::size_t rows = lCoefs.size(); // Количество строк в СЛАУ
     solution.resize(rows); // Искомое решение
@@ -2036,4 +2060,35 @@ Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfFinitElems){
         fVec.push_back(f(tempX));
     }
     return numOfFinitElems + 1;  
+}
+
+// Коэффициенты Лагранжа 
+template<typename Type>
+Type c(Type x, const std::vector<Type> &xVec, std::size_t k){
+    std::size_t numOfFinitElems = xVec.size();
+    if (k > numOfFinitElems + 1){
+        return NAN;
+    }
+    Type mult = 1.0;
+    for (std::size_t i = 0; i < k; i++){
+        mult *= (x - xVec[i]) / (xVec[k] - xVec[i]);
+    }
+    for (std::size_t i = k + 1; i < numOfFinitElems; i++){
+        mult *= (x - xVec[i]) / (xVec[k] - xVec[i]);
+    }
+    return mult;
+}
+
+// Полином Лагранжа
+template<typename Type>
+Type LagrangePolynom(Type x, const std::vector<Type> &xVec, const std::vector<Type> &fVec){
+    std::size_t numOfFinitElems = xVec.size();
+    if (numOfFinitElems != fVec.size()){
+        return NAN;
+    }
+    Type sum = 0.0;
+    for (std::size_t k = 0; k < numOfFinitElems; k++){
+        sum += c(x, xVec, k) * fVec[k]; 
+    }
+    return sum;
 }

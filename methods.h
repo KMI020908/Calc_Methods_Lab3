@@ -23,6 +23,9 @@ template<typename Type>
 SOLUTION_FLAG tridiagonalAlgoritm(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, std::vector<Type> &solution);
 
 template<typename Type>
+SOLUTION_FLAG tridiagonalAlgoritm(const std::vector<Type> &diag, std::vector<Type> &lDiag, std::vector<Type> &uDiag, const std::vector<Type> &rVec, std::vector<Type> &solution);
+
+template<typename Type>
 std::size_t simpleItMethod(const std::vector<std::vector<Type>> &lCoefs, const std::vector<Type> &rCoefs, const std::vector<Type> 
 &firstVec, std::vector<Type> &solution, Type tao, Type accuracy = 1e-7, double p = 2.0, Type epsilon_0 = 1e-4, std::size_t stopIt = 100000);
 
@@ -202,5 +205,11 @@ Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfFinitElems);
 template<typename Type>
 std::size_t getChebyshevGrid(std::vector<Type> &xVec, std::vector<Type> &fVec, 
 Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfFinitElems);
+
+template<typename Type>
+Type c(Type x, const std::vector<Type> &xVec, std::size_t k);
+
+template<typename Type>
+Type LagrangePolynom(Type x, const std::vector<Type> &xVec, const std::vector<Type> &fVec);
 
 #endif
