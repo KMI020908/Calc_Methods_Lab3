@@ -199,17 +199,20 @@ Type accuracy = 1e-6, bool is3Diag = false);
 
 // Лаба 3
 template<typename Type>
-std::size_t getUniformGrid(std::vector<Type> &xVec, std::vector<Type> &fVec, 
+std::size_t getUniformGrid(std::vector<Type> &xGrid, std::vector<Type> &fGrid, 
 Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfFinitElems);
 
 template<typename Type>
-std::size_t getChebyshevGrid(std::vector<Type> &xVec, std::vector<Type> &fVec, 
+std::size_t getChebyshevGrid(std::vector<Type> &xGrid, std::vector<Type> &fGrid, 
 Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfFinitElems);
 
 template<typename Type>
-Type c(Type x, const std::vector<Type> &xVec, std::size_t k);
+Type c(Type x, const std::vector<Type> &xGrid, std::size_t k);
 
 template<typename Type>
-Type LagrangePolynom(Type x, const std::vector<Type> &xVec, const std::vector<Type> &fVec);
+Type LagrangePolynom(Type x, const std::vector<Type> &xGrid, const std::vector<Type> &fGrid);
+
+template<typename Type>
+SOLUTION_FLAG getLagrangeInterpolation(const std::vector<Type> &xVec, std::vector<Type> &fVec, std::vector<Type> &xGrid, const std::vector<Type> &fGrid);
 
 #endif

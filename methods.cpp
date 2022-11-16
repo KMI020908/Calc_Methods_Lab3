@@ -2030,65 +2030,173 @@ Type accuracy, bool is3Diag){
 // Лаба 3
 
 template<typename Type>
-std::size_t getUniformGrid(std::vector<Type> &xVec, std::vector<Type> &fVec, 
+std::size_t getUniformGrid(std::vector<Type> &xGrid, std::vector<Type> &fGrid, 
 Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfFinitElems){
     if (lastX <= firstX){
         return 0;
     }
-    xVec.clear();
-    fVec.clear();
+    xGrid.clear();
+    fGrid.clear();
     Type h = (lastX - firstX) / numOfFinitElems;
     for (std::size_t i = 0; i < numOfFinitElems + 1; i++){
         Type tempX = firstX + h * i;
-        xVec.push_back(tempX);
-        fVec.push_back(f(tempX));
+        xGrid.push_back(tempX);
+        fGrid.push_back(f(tempX));
     }
     return numOfFinitElems + 1;
 }
 
 template<typename Type>
-std::size_t getChebyshevGrid(std::vector<Type> &xVec, std::vector<Type> &fVec, 
+std::size_t getChebyshevGrid(std::vector<Type> &xGrid, std::vector<Type> &fGrid, 
 Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfFinitElems){
     if (lastX <= firstX){
         return 0;
     }
-    xVec.clear();
-    fVec.clear();
+    xGrid.clear();
+    fGrid.clear();
     for (std::size_t i = 0; i < numOfFinitElems + 1; i++){
         Type tempX = (firstX + lastX) / 2.0 + (lastX - firstX) / 2.0 * std::cos(((2.0 * i + 1.0) * M_PI) / (2.0 * (numOfFinitElems + 1.0)));
-        xVec.push_back(tempX);
-        fVec.push_back(f(tempX));
+        xGrid.push_back(tempX);
+        fGrid.push_back(f(tempX));
     }
     return numOfFinitElems + 1;  
 }
 
 // Коэффициенты Лагранжа 
 template<typename Type>
-Type c(Type x, const std::vector<Type> &xVec, std::size_t k){
-    std::size_t numOfFinitElems = xVec.size();
+Type c(Type x, const std::vector<Type> &xGrid, std::size_t k){
+    std::size_t numOfFinitElems = xGrid.size();
     if (k > numOfFinitElems + 1){
         return NAN;
     }
     Type mult = 1.0;
     for (std::size_t i = 0; i < k; i++){
-        mult *= (x - xVec[i]) / (xVec[k] - xVec[i]);
+        mult *= (x - xGrid[i]) / (xGrid[k] - xGrid[i]);
     }
     for (std::size_t i = k + 1; i < numOfFinitElems; i++){
-        mult *= (x - xVec[i]) / (xVec[k] - xVec[i]);
+        mult *= (x - xGrid[i]) / (xGrid[k] - xGrid[i]);
     }
     return mult;
 }
 
 // Полином Лагранжа
 template<typename Type>
-Type LagrangePolynom(Type x, const std::vector<Type> &xVec, const std::vector<Type> &fVec){
-    std::size_t numOfFinitElems = xVec.size();
-    if (numOfFinitElems != fVec.size()){
+Type LagrangePolynom(Type x, const std::vector<Type> &xGrid, const std::vector<Type> &fGrid){
+    std::size_t numOfFinitElems = xGrid.size();
+    if (numOfFinitElems != fGrid.size()){
         return NAN;
     }
     Type sum = 0.0;
     for (std::size_t k = 0; k < numOfFinitElems; k++){
-        sum += c(x, xVec, k) * fVec[k]; 
+        sum += c(x, xGrid, k) * fGrid[k]; 
     }
     return sum;
+}
+
+// Интерполяция полиномом Лагранжа
+template<typename Type>
+SOLUTION_FLAG getLagrangeInterpolation(const std::vector<Type> &xVec, std::vector<Type> &fVec, std::vector<Type> &xGrid, const std::vector<Type> &fGrid){
+    std::size_t numOfFinitElems = xGrid.size();
+    if (numOfFinitElems != fGrid.size()){
+        return NO_SOLUTION;
+    }
+    fVec.clear();
+    std::size_t numOfIntervalVal = xVec.size();
+    for (std::size_t i = 0; i < numOfIntervalVal; i++){
+        Type sum = 0.0;
+        for (std::size_t k = 0; k < numOfFinitElems; k++){
+            Type mult = 1.0;
+            for (std::size_t j = 0; j < k; j++){
+                mult *= (xVec[i] - xGrid[j]) / (xGrid[k] - xGrid[j]);
+            }
+            for (std::size_t j = k + 1; j < numOfFinitElems; j++){
+                mult *= (xVec[i] - xGrid[j]) / (xGrid[k] - xGrid[j]);
+            }
+            sum += mult * fGrid[k]; 
+        }
+        fVec.push_back(sum);
+    }
+    return HAS_SOLUTION;
+}
+
+// Сплайн интерполяция
+
+template<typename Type>
+SOLUTION_FLAG findSplineCoefs(const std::vector<Type> &xVec, const std::vector<Type> &fVec, 
+std::vector<Type> &a, std::vector<Type> &b, std::vector<Type> &c, std::vector<Type> &d){
+    std::size_t numOfUnits = xVec.size();
+    if (numOfUnits != fVec.size()){
+        return NO_SOLUTION;
+    }
+    a.clear();
+    b.clear();
+    c.clear();
+    d.clear();
+    for (std::size_t i = 1; i < numOfUnits; i++){
+        a.push_back(fVec[i - 1]);
+    }
+    std::vector<Type> h;
+    for (std::size_t i = 1; i < numOfUnits; i++){
+        h.push_back(xVec[i] - xVec[i - 1]);
+    }
+    std::vector<Type> g;
+    for (std::size_t i = 1; i < numOfUnits - 1; i++){
+        g.push_back((fVec[i] - fVec[i - 1]) / h[i]);
+    }
+
+    std::vector<Type> diag = {1.0};
+    for (std::size_t i = 2; i < numOfUnits - 1; i++){
+        diag.push_back(2.0 * (h[i - 1] + h[i]));
+    }
+    diag.push_back(1.0);
+
+    std::vector<Type> lDiag;
+    for (std::size_t i = 2; i < numOfUnits - 1; i++){
+        lDiag.push_back(h[i - 1]);
+    }
+    lDiag.push_back(0.0);
+
+    std::vector<Type> uDiag = {0.0};
+    for (std::size_t i = 2; i < numOfUnits - 1; i++){
+        uDiag.push_back(h[i]);
+    }
+
+    std::vector<Type> rVec = {0.0};
+    for (std::size_t i = 2; i < numOfUnits - 1; i++){
+        rVec.push_back(3.0 * (g[i] - g[i - 1]));
+    }
+    rVec.push_back(0.0);
+
+    tridiagonalAlgoritm(diag, lDiag, uDiag, rVec, c);
+
+    for (std::size_t i = 1; i < numOfUnits; i++){
+        b.push_back(g[i] - (c[i + 1] - 2.0 * c[i]) * h[i] / 3.0);
+        d.push_back((c[i + 1] - c[i]) / (3.0 * h[i]));
+    }
+    
+    return HAS_SOLUTION;
+}
+
+
+template<typename Type>
+Type cubeSplineFline(Type x, const std::vector<Type> &xVec, std::size_t k, const std::vector<Type> &a, const std::vector<Type> &b, const std::vector<Type> &c, const std::vector<Type> &d){
+    std::size_t numOfUnits = xVec.size();
+    Type val = x - xVec[k - 1];
+    return a[k] + b[k] * val + c[k] * std::pow(val, 2) + d[k] * std::pow(val, 3);
+}
+
+template<typename Type>
+Type cubeSpline(const std::vector<Type> &intervalX, const std::vector<Type> &xVec, 
+const std::vector<Type> &a, const std::vector<Type> &b, const std::vector<Type> &c, const std::vector<Type> &d, std::vector<Type> &fVec){
+    std::size_t numOfUnits = xVec.size();
+    std::size_t i = 0;
+    fVec.clear();
+    for (std::size_t k = 1; k < numOfUnits; k++){
+        while (xVec[k - 1] <= intervalX[i] && intervalX[i] < xVec[k]){
+            Type val = intervalX[i] - xVec[k - 1];
+            fVec.push_back(a[k] + b[k] * val + c[k] * std::pow(val, 2) + d[k] * std::pow(val, 3));
+            i++;
+        }
+    }
+    return 0.0;
 }
