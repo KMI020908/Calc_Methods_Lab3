@@ -2237,3 +2237,57 @@ std::vector<Type> &chebError){
     }
     return chebError.size();
 }
+
+template<typename Type>
+std::size_t getInterpolationErrorsSplineUniform(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
+std::vector<Type> &uniError){
+    uniError.clear();
+    std::vector<Type> xGrid, fGrid;
+    std::vector<Type> a, b, c, d;
+    for (std::size_t n = 1; n <= numOfErr; n++){
+        Type maxErr = 0.0; 
+        getUniformGrid(xGrid, fGrid, f, firstX, lastX, n);
+        findSplineCoefs(xGrid, fGrid, a, b, c, d);
+        Type tempX = xGrid[0];
+        Type h = (xGrid[n] - xGrid[0]) / (2.0 * numOfErr);
+        for (std::size_t k = 1; k < n + 1; k++){
+            while (xGrid[k - 1] <= tempX && tempX <= xGrid[k]){
+                Type val = tempX - xGrid[k - 1];
+                Type tempErr = std::abs(a[k - 1] + b[k - 1] * val + c[k - 1] * std::pow(val, 2) + d[k - 1] * std::pow(val, 3) - f(tempX));
+                if (tempErr > maxErr){
+                    maxErr = tempErr;
+                }
+                tempX += h;
+            }
+        }
+        uniError.push_back(maxErr);
+    }
+    return uniError.size();
+}
+
+template<typename Type>
+std::size_t getInterpolationErrorsSplineChebyshev(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
+std::vector<Type> &chebError){
+    chebError.clear();
+    std::vector<Type> xGrid, fGrid;
+    std::vector<Type> a, b, c, d;
+    for (std::size_t n = 1; n <= numOfErr; n++){
+        Type maxErr = 0.0; 
+        getChebyshevGrid(xGrid, fGrid, f, firstX, lastX, n);
+        findSplineCoefs(xGrid, fGrid, a, b, c, d);
+        Type tempX = xGrid[0];
+        Type h = (xGrid[n] - xGrid[0]) / (2.0 * numOfErr);
+        for (std::size_t k = 1; k < n + 1; k++){
+            while (xGrid[k - 1] <= tempX && tempX <= xGrid[k]){
+                Type val = tempX - xGrid[k - 1];
+                Type tempErr = std::abs(a[k - 1] + b[k - 1] * val + c[k - 1] * std::pow(val, 2) + d[k - 1] * std::pow(val, 3) - f(tempX));
+                if (tempErr > maxErr){
+                    maxErr = tempErr;
+                }
+                tempX += h;
+            }
+        }
+        chebError.push_back(maxErr);
+    }
+    return chebError.size();
+}

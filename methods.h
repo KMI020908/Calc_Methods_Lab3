@@ -230,4 +230,12 @@ template<typename Type>
 std::size_t getInterpolationErrorsLagrangeChebyshev(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
 std::vector<Type> &chebError);
 
+template<typename Type>
+std::size_t getInterpolationErrorsSplineUniform(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
+std::vector<Type> &uniError);
+
+template<typename Type>
+std::size_t getInterpolationErrorsSplineChebyshev(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
+std::vector<Type> &chebError);
+
 #endif
