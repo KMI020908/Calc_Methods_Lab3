@@ -563,12 +563,10 @@ FILE_FLAG writeValueTable(const std::vector<Type> &xVec, const std::vector<Type>
     }
     
     std::size_t numOfUnits = xVec.size();
-    /*
     if (fVec.size() != numOfUnits){
         file.close();
         return IS_CLOSED;
     }
-    */
     for (std::size_t i = 0; i < numOfUnits; i++){
         file << xVec[i] << '\t' << '\t' << fVec[i] << '\n';
     }

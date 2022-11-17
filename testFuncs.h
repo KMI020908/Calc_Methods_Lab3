@@ -16,12 +16,17 @@ Type func2(Type x){
 
 template<typename Type>
 Type func3(Type x){
-    return std::atan(1.0 + 10.0 * x * x);
+    return 1.0 / std::atan(1.0 + 10.0 * x * x);
 }
 
 template<typename Type>
 Type func4(Type x){
-    return std::pow(4.0 * pow(x, 3) + 2.0 * pow(x, 2) - 4.0 * x + 2.0, std::sqrt(2)) + std::asin(1.0 / (5.0 + x - pow(x, 2)) - 5.0);
+    return std::pow(4.0 * pow(x, 3) + 2.0 * pow(x, 2) - 4.0 * x + 2.0, std::sqrt(2.0)) + std::asin(1.0 / (5.0 + x - pow(x, 2)))  - 5.0;
+}
+
+template<typename Type>
+Type func5(Type x){
+    return 1.0;
 }
 
 #endif

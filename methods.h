@@ -213,6 +213,13 @@ template<typename Type>
 Type LagrangePolynom(Type x, const std::vector<Type> &xGrid, const std::vector<Type> &fGrid);
 
 template<typename Type>
-SOLUTION_FLAG getLagrangeInterpolation(const std::vector<Type> &xVec, std::vector<Type> &fVec, std::vector<Type> &xGrid, const std::vector<Type> &fGrid);
+SOLUTION_FLAG getLagrangeInterpolation(const std::vector<Type> &xVec, std::vector<Type> &fVec, const std::vector<Type> &xGrid, const std::vector<Type> &fGrid);
+
+template<typename Type>
+SOLUTION_FLAG findSplineCoefs(const std::vector<Type> &xGrid, const std::vector<Type> &fGrid, 
+std::vector<Type> &a, std::vector<Type> &b, std::vector<Type> &c, std::vector<Type> &d);
+
+template<typename Type>
+SOLUTION_FLAG getCubeSplineInterpolation(const std::vector<Type> &xVec, std::vector<Type> &fVec, const std::vector<Type> &xGrid, const std::vector<Type> &fGrid);
 
 #endif

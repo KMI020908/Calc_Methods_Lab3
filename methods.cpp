@@ -2055,7 +2055,7 @@ Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfFinitElems){
     xGrid.clear();
     fGrid.clear();
     for (std::size_t i = 0; i < numOfFinitElems + 1; i++){
-        Type tempX = (firstX + lastX) / 2.0 + (lastX - firstX) / 2.0 * std::cos(((2.0 * i + 1.0) * M_PI) / (2.0 * (numOfFinitElems + 1.0)));
+        Type tempX = (firstX + lastX) / 2.0 + (firstX - lastX) / 2.0 * std::cos(((2.0 * i + 1.0) * M_PI) / (2.0 * (numOfFinitElems + 1.0))); 
         xGrid.push_back(tempX);
         fGrid.push_back(f(tempX));
     }
@@ -2095,7 +2095,7 @@ Type LagrangePolynom(Type x, const std::vector<Type> &xGrid, const std::vector<T
 
 // Интерполяция полиномом Лагранжа
 template<typename Type>
-SOLUTION_FLAG getLagrangeInterpolation(const std::vector<Type> &xVec, std::vector<Type> &fVec, std::vector<Type> &xGrid, const std::vector<Type> &fGrid){
+SOLUTION_FLAG getLagrangeInterpolation(const std::vector<Type> &xVec, std::vector<Type> &fVec, const std::vector<Type> &xGrid, const std::vector<Type> &fGrid){
     std::size_t numOfFinitElems = xGrid.size();
     if (numOfFinitElems != fGrid.size()){
         return NO_SOLUTION;
@@ -2122,10 +2122,10 @@ SOLUTION_FLAG getLagrangeInterpolation(const std::vector<Type> &xVec, std::vecto
 // Сплайн интерполяция
 
 template<typename Type>
-SOLUTION_FLAG findSplineCoefs(const std::vector<Type> &xVec, const std::vector<Type> &fVec, 
+SOLUTION_FLAG findSplineCoefs(const std::vector<Type> &xGrid, const std::vector<Type> &fGrid, 
 std::vector<Type> &a, std::vector<Type> &b, std::vector<Type> &c, std::vector<Type> &d){
-    std::size_t numOfUnits = xVec.size();
-    if (numOfUnits != fVec.size()){
+    std::size_t numOfUnits = xGrid.size();
+    if (numOfUnits != fGrid.size()){
         return NO_SOLUTION;
     }
     a.clear();
@@ -2133,70 +2133,63 @@ std::vector<Type> &a, std::vector<Type> &b, std::vector<Type> &c, std::vector<Ty
     c.clear();
     d.clear();
     for (std::size_t i = 1; i < numOfUnits; i++){
-        a.push_back(fVec[i - 1]);
+        a.push_back(fGrid[i - 1]);
     }
     std::vector<Type> h;
     for (std::size_t i = 1; i < numOfUnits; i++){
-        h.push_back(xVec[i] - xVec[i - 1]);
+        h.push_back(xGrid[i] - xGrid[i - 1]);
     }
     std::vector<Type> g;
-    for (std::size_t i = 1; i < numOfUnits - 1; i++){
-        g.push_back((fVec[i] - fVec[i - 1]) / h[i]);
+    for (std::size_t i = 0; i < numOfUnits - 1; i++){
+        g.push_back((fGrid[i + 1] - fGrid[i]) / h[i]);
     }
 
     std::vector<Type> diag = {1.0};
-    for (std::size_t i = 2; i < numOfUnits - 1; i++){
+    for (std::size_t i = 1; i < numOfUnits - 1; i++){
         diag.push_back(2.0 * (h[i - 1] + h[i]));
     }
     diag.push_back(1.0);
 
     std::vector<Type> lDiag;
-    for (std::size_t i = 2; i < numOfUnits - 1; i++){
+    for (std::size_t i = 1; i < numOfUnits - 1; i++){
         lDiag.push_back(h[i - 1]);
     }
     lDiag.push_back(0.0);
 
     std::vector<Type> uDiag = {0.0};
-    for (std::size_t i = 2; i < numOfUnits - 1; i++){
+    for (std::size_t i = 1; i < numOfUnits - 1; i++){
         uDiag.push_back(h[i]);
     }
 
     std::vector<Type> rVec = {0.0};
-    for (std::size_t i = 2; i < numOfUnits - 1; i++){
+    for (std::size_t i = 1; i < numOfUnits - 1; i++){
         rVec.push_back(3.0 * (g[i] - g[i - 1]));
     }
     rVec.push_back(0.0);
 
     tridiagonalAlgoritm(diag, lDiag, uDiag, rVec, c);
 
-    for (std::size_t i = 1; i < numOfUnits; i++){
-        b.push_back(g[i] - (c[i + 1] - 2.0 * c[i]) * h[i] / 3.0);
+    for (std::size_t i = 0; i < numOfUnits - 1; i++){
+        b.push_back(g[i] - (c[i + 1] + 2.0 * c[i]) * h[i] / 3.0);
         d.push_back((c[i + 1] - c[i]) / (3.0 * h[i]));
     }
     
     return HAS_SOLUTION;
 }
 
-
 template<typename Type>
-Type cubeSplineFline(Type x, const std::vector<Type> &xVec, std::size_t k, const std::vector<Type> &a, const std::vector<Type> &b, const std::vector<Type> &c, const std::vector<Type> &d){
-    std::size_t numOfUnits = xVec.size();
-    Type val = x - xVec[k - 1];
-    return a[k] + b[k] * val + c[k] * std::pow(val, 2) + d[k] * std::pow(val, 3);
-}
-
-template<typename Type>
-Type cubeSpline(const std::vector<Type> &intervalX, const std::vector<Type> &xVec, 
-const std::vector<Type> &a, const std::vector<Type> &b, const std::vector<Type> &c, const std::vector<Type> &d, std::vector<Type> &fVec){
-    std::size_t numOfUnits = xVec.size();
+SOLUTION_FLAG getCubeSplineInterpolation(const std::vector<Type> &xVec, std::vector<Type> &fVec, const std::vector<Type> &xGrid, const std::vector<Type> &fGrid){
+    std::size_t numOfUnits = xGrid.size();
+    std::vector<Type> a, b, c, d;
+    findSplineCoefs(xGrid, fGrid, a, b, c, d);
     std::size_t i = 0;
     fVec.clear();
     for (std::size_t k = 1; k < numOfUnits; k++){
-        while (xVec[k - 1] <= intervalX[i] && intervalX[i] < xVec[k]){
-            Type val = intervalX[i] - xVec[k - 1];
-            fVec.push_back(a[k] + b[k] * val + c[k] * std::pow(val, 2) + d[k] * std::pow(val, 3));
+        while (xGrid[k - 1] <= xVec[i] && xVec[i] <= xGrid[k]){
+            Type val = xVec[i] - xGrid[k - 1];
+            fVec.push_back(a[k - 1] + b[k - 1] * val + c[k - 1] * std::pow(val, 2) + d[k - 1] * std::pow(val, 3));
             i++;
         }
     }
-    return 0.0;
+    return HAS_SOLUTION;
 }
