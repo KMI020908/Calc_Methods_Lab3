@@ -74,7 +74,7 @@ const std::string &S_U_OUT_FILE_PATH, const std::string &S_CH_OUT_FILE_PATH){
 
 template<typename Type>
 void temp_main(){
-    std::size_t numOfFinElems = 50; 
+    std::size_t numOfFinElems = 100; 
 
     checkTestLagrange(numOfFinElems, func1, -1.0, 1.0, U_IN_FILE_PATH_1, CH_IN_FILE_PATH_1, L_U_OUT_FILE_PATH_1, L_CH_OUT_FILE_PATH_1);
     checkTestSpline(numOfFinElems, func1, -1.0, 1.0, S_U_OUT_FILE_PATH_1, S_CH_OUT_FILE_PATH_1);
