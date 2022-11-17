@@ -2193,3 +2193,47 @@ SOLUTION_FLAG getCubeSplineInterpolation(const std::vector<Type> &xVec, std::vec
     }
     return HAS_SOLUTION;
 }
+
+template<typename Type>
+std::size_t getInterpolationErrorsLagrangeUniform(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
+std::vector<Type> &uniError){
+    uniError.clear();
+    std::vector<Type> xGrid, fGrid;
+    for (std::size_t n = 1; n <= numOfErr; n++){
+        Type maxErr = 0.0; 
+        getUniformGrid(xGrid, fGrid, f, firstX, lastX, n);
+        Type tempX = xGrid[0];
+        Type h = (xGrid[n] - xGrid[0]) / (2.0 * numOfErr);
+        while (tempX <= xGrid[n]){
+            Type tempErr = std::abs(LagrangePolynom(tempX, xGrid, fGrid) - f(tempX));
+            if (tempErr > maxErr){
+                maxErr = tempErr;
+            }
+            tempX += h;
+        }
+        uniError.push_back(maxErr);
+    }
+    return uniError.size();
+}
+
+template<typename Type>
+std::size_t getInterpolationErrorsLagrangeChebyshev(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
+std::vector<Type> &chebError){
+    chebError.clear();
+    std::vector<Type> xGrid, fGrid;
+    for (std::size_t n = 1; n <= numOfErr; n++){
+        Type maxErr = 0.0; 
+        getChebyshevGrid(xGrid, fGrid, f, firstX, lastX, n);
+        Type tempX = xGrid[0];
+        Type h = (xGrid[n] - xGrid[0]) / (2.0 * numOfErr);
+        while (tempX <= xGrid[n]){
+            Type tempErr = std::abs(LagrangePolynom(tempX, xGrid, fGrid) - f(tempX));
+            if (tempErr > maxErr){
+                maxErr = tempErr;
+            }
+            tempX += h;
+        }
+        chebError.push_back(maxErr);
+    }
+    return chebError.size();
+}

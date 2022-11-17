@@ -222,4 +222,12 @@ std::vector<Type> &a, std::vector<Type> &b, std::vector<Type> &c, std::vector<Ty
 template<typename Type>
 SOLUTION_FLAG getCubeSplineInterpolation(const std::vector<Type> &xVec, std::vector<Type> &fVec, const std::vector<Type> &xGrid, const std::vector<Type> &fGrid);
 
+template<typename Type>
+std::size_t getInterpolationErrorsLagrangeUniform(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
+std::vector<Type> &uniError);
+
+template<typename Type>
+std::size_t getInterpolationErrorsLagrangeChebyshev(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
+std::vector<Type> &chebError);
+
 #endif
