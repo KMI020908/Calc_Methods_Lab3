@@ -17,11 +17,6 @@ titlef5 = "y = 1"
 
 titleList = [titlef1, titlef2, titlef3, titlef4, titlef5]
 funcList = [f1, f2, f3, f4, f5]
-
-#Аргументы функций
-numOfFunc::Int = 1;
-interval = [-1.0, 1.0]
-
  
 function getInterpPlot(numOfFunc::Int, methodType::String, gridType::String, funcList, titleList, funcColor::String, plRange = [], h = 600, w = 900)
     numOfFuncString = string(numOfFunc)
@@ -192,6 +187,96 @@ function getInterpPlot(numOfFunc::Int, methodType::String, gridType::String, fun
     return pl, errPl, groupPl
 end
 
+function makeErrorPlot(numOfFunc, methodType::String, gridType::String, titleList, interval, funcColor, plRange = [], h = 600, w = 900)
+    numOfFuncString = string(numOfFunc)
+    errors = readdlm("D:\\Calc_Methods\\Lab3\\$methodType\\$gridType\\Errors\\error$numOfFuncString.txt")
+    titleFunc = titleList[numOfFunc]
+    minX = minimum(interval)
+    maxX = maximum(interval)
+    gridText = ""
+    if gridType == "Uniform"
+        gridText =   "на равномерной сетке"
+    else
+        gridText = "на Чебышёвской сетке"
+    end
+    methodText = ""
+    if methodType == "Lagrange"
+        methodText = "многочленами Лагранжа"
+    else
+        methodText = "кубическими сплайнами"
+    end
+    if plRange == []
+        push!(plRange, 0.0)
+        push!(plRange, maximum(errors) + maximum(errors) / 100)
+    end
+    layoutErr = Layout(
+        font_family = "Times New Roman",
+        font_color = "black",
+        title = attr(
+            paper_bgcolor = "red",
+            text = "Зависимость макс. ошибки интерполирования $methodText $gridText. $titleFunc, x ∈ [$minX, $maxX]",
+            font_family = "Times New Roman",
+            font_color = "black",
+            font_size = 17,
+            autosize = false
+        ),
+        height = h,
+        width = w,
+        paper_bgcolor = "white",
+        plot_bgcolor = "white",
+        coloraxis = attr(
+          outlinecolor = "black"  
+        ),
+        xaxis = attr(
+            title = attr(
+                text = "x",
+                font_family = "Times New Roman",
+                font_color = "black",
+                font_size = 20,
+            ),
+            color = "black",
+            gridcolor = "black",
+            gridwidth = 1,
+            zerolinecolor = "black",
+            zerolinewidth = 3,
+            tickfont = attr(
+                size = 15
+            )
+        ),
+        yaxis = attr(
+            title = attr(
+                text = "Ошибка интерполирования",
+                font_family = "Times New Roman",
+                font_color = "black",
+                font_size = 20,
+            ),
+            gridcolor = "black",
+            exponentformat = "power",
+            gridwidth = 1 ,
+            zerolinecolor = "black",
+            zerolinewidth = 3,
+            tickfont = attr(
+                size = 15
+            ),
+            range = [plRange[1], plRange[2]]   
+        )
+    );
+    
+    markerAtt = attr(
+            showline = true,
+            color = funcColor, 
+            line_width=1
+        );
+    
+    n = length(errors) 
+    errPl = plot(
+        scatter(x = 1 : n, y = [errors[i] for i in 1 : n], mode = "markers", marker = markerAtt),
+        layoutErr
+    )
+
+    return errPl
+end
+
 function makePlot(numOfFunc, funcList, titleList, interval, funcColor, h = 600, w = 800)
     titleFunc = titleList[numOfFunc]
     minX = minimum(interval)
@@ -261,3 +346,5 @@ function makePlot(numOfFunc, funcList, titleList, interval, funcColor, h = 600, 
 
     return pl
 end
+
+#makeErrorPlot(1, methodTypeList[1], gridTypeList[1], titleList, [-1.0, 1.0], "red")
