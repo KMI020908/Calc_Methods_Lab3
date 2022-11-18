@@ -346,5 +346,3 @@ function makePlot(numOfFunc, funcList, titleList, interval, funcColor, h = 600, 
 
     return pl
 end
-
-#makeErrorPlot(1, methodTypeList[1], gridTypeList[1], titleList, [-1.0, 1.0], "red")

@@ -220,22 +220,22 @@ SOLUTION_FLAG findSplineCoefs(const std::vector<Type> &xGrid, const std::vector<
 std::vector<Type> &a, std::vector<Type> &b, std::vector<Type> &c, std::vector<Type> &d);
 
 template<typename Type>
-SOLUTION_FLAG getCubeSplineInterpolation(const std::vector<Type> &xVec, std::vector<Type> &fVec, const std::vector<Type> &xGrid, const std::vector<Type> &fGrid);
+SOLUTION_FLAG getCubeSplineInterpolation(const std::vector<Type> &xVec, std::vector<Type> &fVec, const std::vector<Type> &xGrid, const std::vector<Type> &fGrid, Type accuracy = 1e-10);
 
 template<typename Type>
 std::size_t getInterpolationErrorsLagrangeUniform(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
-std::vector<Type> &uniError);
+std::vector<Type> &uniError, Type accuracy = 1e-10);
 
 template<typename Type>
 std::size_t getInterpolationErrorsLagrangeChebyshev(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
-std::vector<Type> &chebError);
+std::vector<Type> &chebError, Type accuracy = 1e-10);
 
 template<typename Type>
 std::size_t getInterpolationErrorsSplineUniform(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
-std::vector<Type> &uniError);
+std::vector<Type> &uniError, Type accuracy = 1e-10);
 
 template<typename Type>
 std::size_t getInterpolationErrorsSplineChebyshev(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
-std::vector<Type> &chebError);
+std::vector<Type> &chebError, Type accuracy = 1e-10);
 
 #endif

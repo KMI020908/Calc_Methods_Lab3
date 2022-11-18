@@ -2178,14 +2178,15 @@ std::vector<Type> &a, std::vector<Type> &b, std::vector<Type> &c, std::vector<Ty
 }
 
 template<typename Type>
-SOLUTION_FLAG getCubeSplineInterpolation(const std::vector<Type> &xVec, std::vector<Type> &fVec, const std::vector<Type> &xGrid, const std::vector<Type> &fGrid){
+SOLUTION_FLAG getCubeSplineInterpolation(const std::vector<Type> &xVec, std::vector<Type> &fVec, const std::vector<Type> &xGrid, const std::vector<Type> &fGrid, 
+Type accuracy){
     std::size_t numOfUnits = xGrid.size();
     std::vector<Type> a, b, c, d;
     findSplineCoefs(xGrid, fGrid, a, b, c, d);
     std::size_t i = 0;
     fVec.clear();
     for (std::size_t k = 1; k < numOfUnits; k++){
-        while (xGrid[k - 1] <= xVec[i] && xVec[i] <= xGrid[k]){
+        while (xGrid[k - 1] <= xVec[i] && xVec[i] <= xGrid[k] + accuracy){
             Type val = xVec[i] - xGrid[k - 1];
             fVec.push_back(a[k - 1] + b[k - 1] * val + c[k - 1] * std::pow(val, 2) + d[k - 1] * std::pow(val, 3));
             i++;
@@ -2196,7 +2197,7 @@ SOLUTION_FLAG getCubeSplineInterpolation(const std::vector<Type> &xVec, std::vec
 
 template<typename Type>
 std::size_t getInterpolationErrorsLagrangeUniform(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
-std::vector<Type> &uniError){
+std::vector<Type> &uniError, Type accuracy){
     uniError.clear();
     std::vector<Type> xGrid, fGrid;
     for (std::size_t n = 1; n <= numOfErr; n++){
@@ -2204,7 +2205,7 @@ std::vector<Type> &uniError){
         getUniformGrid(xGrid, fGrid, f, firstX, lastX, n);
         Type tempX = xGrid[0];
         Type h = (xGrid[n] - xGrid[0]) / (2.0 * numOfErr);
-        while (tempX <= xGrid[n]){
+        while (tempX <= xGrid[n] + accuracy){
             Type tempErr = std::abs(LagrangePolynom(tempX, xGrid, fGrid) - f(tempX));
             if (tempErr > maxErr){
                 maxErr = tempErr;
@@ -2218,7 +2219,7 @@ std::vector<Type> &uniError){
 
 template<typename Type>
 std::size_t getInterpolationErrorsLagrangeChebyshev(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
-std::vector<Type> &chebError){
+std::vector<Type> &chebError, Type accuracy){
     chebError.clear();
     std::vector<Type> xGrid, fGrid;
     for (std::size_t n = 1; n <= numOfErr; n++){
@@ -2226,7 +2227,7 @@ std::vector<Type> &chebError){
         getChebyshevGrid(xGrid, fGrid, f, firstX, lastX, n);
         Type tempX = xGrid[0];
         Type h = (xGrid[n] - xGrid[0]) / (2.0 * numOfErr);
-        while (tempX <= xGrid[n]){
+        while (tempX <= xGrid[n] + accuracy){
             Type tempErr = std::abs(LagrangePolynom(tempX, xGrid, fGrid) - f(tempX));
             if (tempErr > maxErr){
                 maxErr = tempErr;
@@ -2240,7 +2241,7 @@ std::vector<Type> &chebError){
 
 template<typename Type>
 std::size_t getInterpolationErrorsSplineUniform(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
-std::vector<Type> &uniError){
+std::vector<Type> &uniError, Type accuracy){
     uniError.clear();
     std::vector<Type> xGrid, fGrid;
     std::vector<Type> a, b, c, d;
@@ -2251,7 +2252,7 @@ std::vector<Type> &uniError){
         Type tempX = xGrid[0];
         Type h = (xGrid[n] - xGrid[0]) / (2.0 * numOfErr);
         for (std::size_t k = 1; k < n + 1; k++){
-            while (xGrid[k - 1] <= tempX && tempX <= xGrid[k]){
+            while (xGrid[k - 1] <= tempX && tempX <= xGrid[k] + accuracy){
                 Type val = tempX - xGrid[k - 1];
                 Type tempErr = std::abs(a[k - 1] + b[k - 1] * val + c[k - 1] * std::pow(val, 2) + d[k - 1] * std::pow(val, 3) - f(tempX));
                 if (tempErr > maxErr){
@@ -2267,7 +2268,7 @@ std::vector<Type> &uniError){
 
 template<typename Type>
 std::size_t getInterpolationErrorsSplineChebyshev(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
-std::vector<Type> &chebError){
+std::vector<Type> &chebError, Type accuracy){
     chebError.clear();
     std::vector<Type> xGrid, fGrid;
     std::vector<Type> a, b, c, d;
@@ -2278,7 +2279,7 @@ std::vector<Type> &chebError){
         Type tempX = xGrid[0];
         Type h = (xGrid[n] - xGrid[0]) / (2.0 * numOfErr);
         for (std::size_t k = 1; k < n + 1; k++){
-            while (xGrid[k - 1] <= tempX && tempX <= xGrid[k]){
+            while (xGrid[k - 1] <= tempX && tempX <= xGrid[k] + accuracy){
                 Type val = tempX - xGrid[k - 1];
                 Type tempErr = std::abs(a[k - 1] + b[k - 1] * val + c[k - 1] * std::pow(val, 2) + d[k - 1] * std::pow(val, 3) - f(tempX));
                 if (tempErr > maxErr){

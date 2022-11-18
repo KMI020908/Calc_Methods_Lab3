@@ -29,4 +29,9 @@ Type func5(Type x){
     return 1.0;
 }
 
+template<typename Type>
+Type func6(Type x){
+    return std::exp(x);
+}
+
 #endif
