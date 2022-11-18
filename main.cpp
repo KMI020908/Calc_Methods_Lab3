@@ -38,7 +38,7 @@ const std::string &L_U_ERROR_FILE_PATH, const std::string &L_CH_ERROR_FILE_PATH,
     }
     getLagrangeInterpolation(xVec, fVec, xGrid, fGrid);
     writeValueTable(xVec, fVec, L_CH_OUT_FILE_PATH);
-
+    /*
     std::vector<Type> uniErr;
     getInterpolationErrorsLagrangeUniform(f, firstX, lastX, numOfErrors, uniErr, accuracy);
     writeVectorFile(uniErr, L_U_ERROR_FILE_PATH);
@@ -46,6 +46,7 @@ const std::string &L_U_ERROR_FILE_PATH, const std::string &L_CH_ERROR_FILE_PATH,
     std::vector<Type> chebErr;
     getInterpolationErrorsLagrangeChebyshev(f, firstX, lastX, numOfErrors, chebErr, accuracy);
     writeVectorFile(chebErr, L_CH_ERROR_FILE_PATH);
+    */
 }
 
 // Процедура проверки кубических сплайнов
@@ -77,7 +78,7 @@ const std::string &S_CH_ERROR_FILE_PATH, std::size_t numOfErrors = 100, Type acc
     }
     getCubeSplineInterpolation(xVec, fVec, xGrid, fGrid, accuracy);
     writeValueTable(xVec, fVec, S_CH_OUT_FILE_PATH);
-
+    /*
     std::vector<Type> uniErr;
     getInterpolationErrorsLagrangeUniform(f, firstX, lastX, numOfErrors, uniErr, accuracy);
     writeVectorFile(uniErr, S_U_ERROR_FILE_PATH);
@@ -85,6 +86,7 @@ const std::string &S_CH_ERROR_FILE_PATH, std::size_t numOfErrors = 100, Type acc
     std::vector<Type> chebErr;
     getInterpolationErrorsLagrangeChebyshev(f, firstX, lastX, numOfErrors, chebErr, accuracy);
     writeVectorFile(chebErr, S_CH_ERROR_FILE_PATH);
+    */
 }
 
 template<typename Type>
@@ -106,6 +108,9 @@ void temp_main(){
     checkTestLagrange(numOfFinElems, func5, -1.0, 1.0, U_IN_FILE_PATH_5, CH_IN_FILE_PATH_5, L_U_OUT_FILE_PATH_5, L_CH_OUT_FILE_PATH_5, L_U_ERROR_FILE_PATH_5, L_CH_ERROR_FILE_PATH_5);
     checkTestSpline(numOfFinElems, func5, -1.0, 1.0, S_U_OUT_FILE_PATH_5, S_CH_OUT_FILE_PATH_5, S_U_ERROR_FILE_PATH_5, S_CH_ERROR_FILE_PATH_5);
 
+    checkTestLagrange(numOfFinElems, func6, 0.0, 2.0, U_IN_FILE_PATH_6, CH_IN_FILE_PATH_6, L_U_OUT_FILE_PATH_6, L_CH_OUT_FILE_PATH_6, L_U_ERROR_FILE_PATH_6, L_CH_ERROR_FILE_PATH_6);
+    checkTestSpline(numOfFinElems, func6, 0.0, 2.0, S_U_OUT_FILE_PATH_6, S_CH_OUT_FILE_PATH_6, S_U_ERROR_FILE_PATH_6, S_CH_ERROR_FILE_PATH_6);
+
     // Проверка ошибки экстрополяции экспоненты на [0; 2]
     std::vector<Type> xGrid;
     std::vector<Type> fGrid;
@@ -116,5 +121,5 @@ void temp_main(){
 
 int main(){
     temp_main<double>();
-    
+    return 0;
 }

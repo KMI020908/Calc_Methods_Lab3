@@ -14,16 +14,18 @@ f4(x) = (4.0 * x^3 + 2.0 * x^2 - 4.0 * x + 2.0) ^ √2 + asin(1.0 / (5.0 + x - x
 titlef4 = "y = (4x³ + 2x² - 4x + 2)^√2 + arcsin(1 / 5 + x - x²) - 5"
 f5(x) = 1.0
 titlef5 = "y = 1"
+f6(x) = exp(x)
+titlef6 = "y = eˣ"
 
-titleList = [titlef1, titlef2, titlef3, titlef4, titlef5]
-funcList = [f1, f2, f3, f4, f5]
+titleList = [titlef1, titlef2, titlef3, titlef4, titlef5, titlef6]
+funcList = [f1, f2, f3, f4, f5, f6]
  
 function getInterpPlot(numOfFunc::Int, methodType::String, gridType::String, funcList, titleList, funcColor::String, plRange = [], h = 600, w = 900)
     numOfFuncString = string(numOfFunc)
     grid = readdlm("D:\\Calc_Methods\\Lab3\\$methodType\\$gridType\\solution$numOfFuncString.txt")
     intervalX = [grid[i] for i in 1 : size(grid)[1]]
     intervalY = [grid[i] for i in size(grid)[1] + 1 : length(grid)]
-    n = (size(grid)[1] - 1) / 2
+    n = size(readdlm("D:\\Calc_Methods\\Lab3\\Tests\\$gridType\\test$numOfFuncString.txt"))[1] - 1
     gridText = ""
     if gridType == "Uniform"
         gridText =   "на равномерной сетке"
