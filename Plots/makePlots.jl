@@ -12,8 +12,17 @@ f3(x) = 1.0 / atan(1.0 + 10 * x^2)
 titlef3 = "y = 1 / arctan(1 + 10x²)"
 f4(x) = (4.0 * x^3 + 2.0 * x^2 - 4.0 * x + 2.0) ^ √2 + asin(1.0 / (5.0 + x - x^2)) - 5.0
 titlef4 = "y = (4x³ + 2x² - 4x + 2)^√2 + arcsin(1 / 5 + x - x²) - 5"
-f5(x) = 1.0
-titlef5 = "y = 1"
+function f5(x)
+    if x ≥ 0
+        return x^2
+    else
+        return -x^2
+    end
+end
+titlef5 = "y = x^2, x ≥ 0 и y = -x^2, x < 0"
+#f5(x) = abs(x)
+#titlef5 = "y = 1"
+#titlef5 = "y = |x|"
 f6(x) = exp(x)
 titlef6 = "y = eˣ"
 
@@ -348,3 +357,25 @@ function makePlot(numOfFunc, funcList, titleList, interval, funcColor, h = 600, 
 
     return pl
 end
+
+layout = Layout(
+    xaxis = attr(
+        exponentformat = "power",
+        title = attr(
+            text = "h"
+        )
+    ),
+    yaxis = attr(
+        exponentformat = "power",
+        title = attr(
+            text = "|f(x) - Sₙ(x)|"
+        )
+    )
+)
+data = readdlm("D:\\Calc_Methods\\Lab3\\errEstimate.txt");
+intervalX = [data[i] for i in 1 : size(data)[1]]
+intervalY = [data[i] for i in size(data)[1] + 1 : length(data)]
+plot(
+    scatter(x = intervalX, y = intervalY, mode = "line"),
+    layout
+)

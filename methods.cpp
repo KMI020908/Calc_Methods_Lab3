@@ -172,7 +172,7 @@ SOLUTION_FLAG tridiagonalAlgoritm(const std::vector<Type> &diag, std::vector<Typ
     std::vector<Type> beta = {rVec[0] / diag[0]};
     for (std::size_t i = 1; i < dim - 1; i++){
         Type c = diag[i] + lDiag[i] * alpha[i - 1];
-        alpha.push_back(-uDiag[i] / c);
+        alpha.push_back(-uDiag[i] / c); 
         beta.push_back((rVec[i] - lDiag[i] * beta[i - 1]) / c);
     }
     beta.push_back((rVec[dim - 1] - lDiag[dim - 1] * beta[dim - 2]) / (diag[dim - 1] + lDiag[dim - 1] * alpha[dim - 2]));
@@ -2291,4 +2291,35 @@ std::vector<Type> &chebError, Type accuracy){
         chebError.push_back(maxErr);
     }
     return chebError.size();
+}
+
+template<typename Type>
+std::size_t getSpeedEstimate(Type (*f)(Type x), Type firstX, Type lastX, Type xi, std::size_t numOfFinEl0, 
+std::vector<Type> &stepVec, std::vector<Type> &errResult, std::vector<Type> &speedResult, std::size_t stopIt = 10, Type accuracy = 1e-10){
+    errResult.clear();
+    speedResult.clear();
+    std::vector<Type> xGrid, fGrid;
+    std::vector<Type> a, b, c, d;
+    std::size_t n = numOfFinEl0;
+    for (std::size_t i = 0; i < stopIt; i++){
+        getUniformGrid(xGrid, fGrid, f, firstX, lastX, n);
+        findSplineCoefs(xGrid, fGrid, a, b, c, d);
+        stepVec.push_back((xGrid[n] - xGrid[0]) / n);
+        //stepVec.push_back(n);
+        for (std::size_t k = 1; k < n + 1; k++){
+            std::cout << k << '\n';
+            if (xGrid[k - 1] <= xi && xi <= xGrid[k] + accuracy){
+                Type val = xi - xGrid[k - 1];
+                errResult.push_back(
+                    std::abs(f(xi) - (a[k - 1] + b[k - 1] * val + c[k - 1] * std::pow(val, 2) + d[k - 1] * std::pow(val, 3)))
+                );
+                break;
+            }
+        }
+        n = 2 * n;
+    }
+    for (std::size_t i = 1; i < errResult.size(); i++){
+        speedResult.push_back(errResult[i - 1] / errResult[i]);
+    }
+    return stopIt;
 }

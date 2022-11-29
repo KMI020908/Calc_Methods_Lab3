@@ -26,8 +26,27 @@ Type func4(Type x){
 
 template<typename Type>
 Type func5(Type x){
+    if (x >= 0){
+        return x * x;
+    }
+    else{
+        return -x * x;
+    }
+}
+
+/*
+template<typename Type>
+Type func5(Type x){
     return 1.0;
 }
+*/
+
+/*
+template<typename Type>
+Type func5(Type x){
+    return std::abs(x);
+}
+*/
 
 template<typename Type>
 Type func6(Type x){
