@@ -135,13 +135,6 @@ void temp_main(){
     std::cout << "Значение многочлена Лагранжа в точке x = 2 + h: " << std::setprecision(16) << LagrangePolynom(2.0 + h, xGrid, fGrid) << '\n';
     std::cout << "Ошибка экстрополяции в точке x = 2 + h на практике: " << std::abs(LagrangePolynom(2.0 + h, xGrid, fGrid) - func6(2.0 + h)) << '\n';
     std::cout << "Оценка ошибки экстрополяции в точке x = 2 + h в теории: " << std::pow(h, numOfFinElems+ 1) * func6(2.0 + h) << '\n';
-
-    std::vector<Type> stepVec;
-    std::vector<Type> errResult;
-    std::vector<Type> speedResult;
-    std::vector<Type> spVec = {};
-
-    
 }
 
 int main(){
