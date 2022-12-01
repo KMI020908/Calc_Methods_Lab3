@@ -139,12 +139,29 @@ void temp_main(){
     std::vector<Type> stepVec;
     std::vector<Type> errResult;
     std::vector<Type> speedResult;
-    getSpeedEstimate(func6, 0.0, 1.0, 0.000001, 4, stepVec, errResult, speedResult, 15);
-    writeValueTable(stepVec, errResult, "D:\\Calc_Methods\\Lab3\\errEstimate.txt");
-    writeVectorFile(speedResult, "D:\\Calc_Methods\\Lab3\\speedEstimate.txt");
+    std::vector<Type> spVec = {};
+
+    
 }
 
 int main(){
-    temp_main<double>();
+    //temp_main<double>();
+    std::vector<double> xGrid = {0.0, 1.0, 2.0, 3.0, 4.0};
+    std::vector<double> fGrid = {0.0, 1.0, 4.0, 9.0, 16.0};
+    std::vector<double> a, b, c, d;
+    findSplineCoefs(xGrid, fGrid, a, b, c, d);
+    std::cout << a << '\n';
+    std::cout << b << '\n';
+    std::cout << c << '\n';
+    std::cout << d << '\n';
+
+    std::vector<double> xiVec, err1, err2, speedResult;
+    getSpeedEstimate(func7, -M_PI, M_PI, 1500, xiVec, err1, err2, speedResult);
+    //getSpeedEstimate(func1, -1.0, 1.0, 500, xiVec, err1, err2, speedResult);
+    writeValueTable(err1, err2, "D:\\Calc_Methods\\Lab3\\errEstimate.txt");
+    writeValueTable(xiVec, speedResult, "D:\\Calc_Methods\\Lab3\\speedEstimate.txt");
+    
+
+
     return 0;
 }

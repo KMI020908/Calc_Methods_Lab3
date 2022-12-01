@@ -2144,36 +2144,31 @@ std::vector<Type> &a, std::vector<Type> &b, std::vector<Type> &c, std::vector<Ty
         g.push_back((fGrid[i + 1] - fGrid[i]) / h[i]);
     }
 
-    std::vector<Type> diag = {1.0};
+    // Заполнение матрицы с учетом условия S''(x_0) = S''(x_n) = 0, т.е. c_1 = c_(n+1) = 0 
+    std::vector<Type> diag;
     for (std::size_t i = 1; i < numOfUnits - 1; i++){
         diag.push_back(2.0 * (h[i - 1] + h[i]));
     }
-    diag.push_back(1.0);
 
-    std::vector<Type> lDiag;
-    for (std::size_t i = 1; i < numOfUnits - 1; i++){
-        lDiag.push_back(h[i - 1]);
-    }
-    lDiag.push_back(0.0);
-
-    std::vector<Type> uDiag = {0.0};
-    for (std::size_t i = 1; i < numOfUnits - 1; i++){
+    std::vector<Type> lDiag, uDiag;
+    for (std::size_t i = 1; i < numOfUnits - 2; i++){
+        lDiag.push_back(h[i]);
         uDiag.push_back(h[i]);
     }
 
-    std::vector<Type> rVec = {0.0};
+    std::vector<Type> rVec;
     for (std::size_t i = 1; i < numOfUnits - 1; i++){
         rVec.push_back(3.0 * (g[i] - g[i - 1]));
     }
-    rVec.push_back(0.0);
 
     tridiagonalAlgoritm(diag, lDiag, uDiag, rVec, c);
+    c.insert(c.begin(), 1, 0.0);
 
     for (std::size_t i = 0; i < numOfUnits - 1; i++){
         b.push_back(g[i] - (c[i + 1] + 2.0 * c[i]) * h[i] / 3.0);
         d.push_back((c[i + 1] - c[i]) / (3.0 * h[i]));
     }
-    
+
     return HAS_SOLUTION;
 }
 
@@ -2294,8 +2289,8 @@ std::vector<Type> &chebError, Type accuracy){
 }
 
 template<typename Type>
-std::size_t getSpeedEstimate(Type (*f)(Type x), Type firstX, Type lastX, Type xi, std::size_t numOfFinEl0, 
-std::vector<Type> &stepVec, std::vector<Type> &errResult, std::vector<Type> &speedResult, std::size_t stopIt = 10, Type accuracy = 1e-10){
+std::size_t getSpeedEstimateInPoint(Type (*f)(Type x), Type firstX, Type lastX, Type xi, std::size_t numOfFinEl0, 
+std::vector<Type> &stepVec, std::vector<Type> &errResult, std::vector<Type> &speedResult, std::size_t stopIt, Type accuracy){
     errResult.clear();
     speedResult.clear();
     std::vector<Type> xGrid, fGrid;
@@ -2322,4 +2317,50 @@ std::vector<Type> &stepVec, std::vector<Type> &errResult, std::vector<Type> &spe
         speedResult.push_back(errResult[i - 1] / errResult[i]);
     }
     return stopIt;
+}
+
+template<typename Type>
+std::size_t getSpeedEstimate(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfFinEl0, std::vector<Type> &xiVec,
+std::vector<Type> &err1, std::vector<Type> &err2, std::vector<Type> &speedResult, Type accuracy){
+    speedResult.clear();
+    std::vector<Type> xGrid, fGrid;
+    std::vector<Type> a, b, c, d;
+    std::size_t n = numOfFinEl0;
+    getUniformGrid(xGrid, fGrid, f, firstX, lastX, n);
+    findSplineCoefs(xGrid, fGrid, a, b, c, d);
+    xiVec.clear();
+    Type h = (lastX - firstX) / n;
+    for (std::size_t i = 0; i < n; i++){
+        xiVec.push_back(xGrid[i] + h / 3.0);
+        xiVec.push_back(xGrid[i] + 2.0 * h / 3.0);
+    }
+    std::size_t i = 0;
+    err1.clear();
+    for (std::size_t k = 1; k < n + 1; k++){
+        while (xGrid[k - 1] <= xiVec[i] && xiVec[i] <= xGrid[k] + accuracy){
+            Type val = xiVec[i] - xGrid[k - 1];
+            err1.push_back(
+                std::abs(f(xiVec[i]) - (a[k - 1] + b[k - 1] * val + c[k - 1] * std::pow(val, 2) + d[k - 1] * std::pow(val, 3)))
+            );
+            i++;
+        }
+    }
+    n *= 2;
+    getUniformGrid(xGrid, fGrid, f, firstX, lastX, n);
+    findSplineCoefs(xGrid, fGrid, a, b, c, d);
+    i = 0;
+    err2.clear();
+    for (std::size_t k = 1; k < n + 1; k++){
+        while (xGrid[k - 1] <= xiVec[i] && xiVec[i] <= xGrid[k] + accuracy){
+            Type val = xiVec[i] - xGrid[k - 1];
+            err2.push_back(
+                std::abs(f(xiVec[i]) - (a[k - 1] + b[k - 1] * val + c[k - 1] * std::pow(val, 2) + d[k - 1] * std::pow(val, 3)))
+            );
+            i++;
+        }
+    }
+    for (std::size_t i = 0; i < err1.size(); i++){
+        speedResult.push_back(err1[i] / err2[i]);
+    }
+    return xiVec.size();
 }

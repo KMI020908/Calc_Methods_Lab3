@@ -53,4 +53,9 @@ Type func6(Type x){
     return std::exp(x);
 }
 
+template<typename Type>
+Type func7(Type x){
+    return std::sin(x);
+}
+
 #endif

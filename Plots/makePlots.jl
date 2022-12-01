@@ -357,25 +357,3 @@ function makePlot(numOfFunc, funcList, titleList, interval, funcColor, h = 600, 
 
     return pl
 end
-
-layout = Layout(
-    xaxis = attr(
-        exponentformat = "power",
-        title = attr(
-            text = "h"
-        )
-    ),
-    yaxis = attr(
-        exponentformat = "power",
-        title = attr(
-            text = "|f(x) - Sₙ(x)|"
-        )
-    )
-)
-data = readdlm("D:\\Calc_Methods\\Lab3\\errEstimate.txt");
-intervalX = [data[i] for i in 1 : size(data)[1]]
-intervalY = [data[i] for i in size(data)[1] + 1 : length(data)]
-plot(
-    scatter(x = intervalX, y = intervalY, mode = "line"),
-    layout
-)

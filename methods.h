@@ -238,4 +238,12 @@ template<typename Type>
 std::size_t getInterpolationErrorsSplineChebyshev(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfErr,
 std::vector<Type> &chebError, Type accuracy = 1e-10);
 
+template<typename Type>
+std::size_t getSpeedEstimateInPoint(Type (*f)(Type x), Type firstX, Type lastX, Type xi, std::size_t numOfFinEl0, 
+std::vector<Type> &stepVec, std::vector<Type> &errResult, std::vector<Type> &speedResult, std::size_t stopIt = 2, Type accuracy = 1e-10);
+
+template<typename Type>
+std::size_t getSpeedEstimate(Type (*f)(Type x), Type firstX, Type lastX, std::size_t numOfFinEl0, std::vector<Type> &xiVec,
+std::vector<Type> &err1, std::vector<Type> &err2, std::vector<Type> &speedResult, Type accuracy = 1e-10);
+
 #endif
